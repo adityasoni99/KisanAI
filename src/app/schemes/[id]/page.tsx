@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { governmentSchemes } from '@/data/governmentSchemes';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
