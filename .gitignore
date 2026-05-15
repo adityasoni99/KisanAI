@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# nested projects & scratch files
+/x-groq-website/
+lint_results.txt

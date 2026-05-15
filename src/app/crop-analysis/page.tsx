@@ -1,5 +1,6 @@
 'use client'
 
+/* eslint-disable @next/next/no-img-element */
 import { useState, useRef, useCallback } from 'react'
 import { Camera, Upload, Image as ImageIcon, CheckCircle, AlertTriangle, Leaf, Bug, Droplets, Sun, X, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
