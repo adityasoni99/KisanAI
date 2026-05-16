@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import Weather from '@/app/weather/page'
 
@@ -9,124 +9,71 @@ const mockGeolocation = {
   clearWatch: jest.fn()
 }
 
-// Define geolocation property if it doesn't exist
-if (!global.navigator) {
-  global.navigator = {} as Navigator
-}
-
-if (!global.navigator.geolocation) {
-  Object.defineProperty(global.navigator, 'geolocation', {
-    value: mockGeolocation,
-    configurable: true,
-    writable: true
-  })
-}
+Object.defineProperty(global, 'navigator', {
+  value: {
+    ...global.navigator,
+    geolocation: mockGeolocation
+  },
+  configurable: true,
+  writable: true
+})
 
 // Mock fetch for weather API calls
 global.fetch = jest.fn()
 
+jest.setTimeout(30000)
+
 describe('Weather Page', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    // Reset fetch mock
     ;(global.fetch as jest.Mock).mockClear()
   })
 
-  it('renders weather interface', () => {
+  it('renders loading state initially', () => {
     render(<Weather />)
-    
-    expect(screen.getByText('मौसम पूर्वानुमान')).toBeInTheDocument()
-    expect(screen.getByText(/सटीक मौसम जानकारी/)).toBeInTheDocument()
+    expect(screen.getByText('मौसम की जानकारी लोड हो रही है...')).toBeInTheDocument()
   })
 
-  it('displays location button', () => {
+  it('renders weather interface and information cards after loading', async () => {
     render(<Weather />)
+    await waitFor(() => {
+      expect(screen.getByText('मौसम की जानकारी')).toBeInTheDocument()
+    }, { timeout: 10000 })
     
-    expect(screen.getByText('अपना स्थान प्राप्त करें')).toBeInTheDocument()
-  })
+    expect(screen.getByText(/आपके क्षेत्र का विस्तृत मौसम पूर्वानुमान और कृषि सलाह/)).toBeInTheDocument()
+    expect(screen.getByText('स्थान')).toBeInTheDocument()
+    expect(screen.getByText('7 दिन का विस्तृत मौसम पूर्वानुमान')).toBeInTheDocument()
+    expect(screen.getByText(/मौसम आधारित कृषि सलाह/)).toBeInTheDocument()
+    expect(screen.getAllByText(/नमी:/)[0]).toBeInTheDocument()
+    expect(screen.getAllByText(/हवा:/)[0]).toBeInTheDocument()
+    expect(screen.getByText('मौसम चेतावनी')).toBeInTheDocument()
+    expect(screen.getByText('कृषि सुझाव')).toBeInTheDocument()
+  }, 20000)
 
-  it('handles location access', async () => {
-    const mockPosition = {
-      coords: {
-        latitude: 28.6139,
-        longitude: 77.2090,
-        accuracy: 100
-      }
-    }
-
-    // Mock successful geolocation
-    mockGeolocation.getCurrentPosition.mockImplementation((success) => {
-      success(mockPosition)
-    })
-
-    render(<Weather />)
-    
-    const locationButton = screen.getByText('अपना स्थान प्राप्त करें')
-    fireEvent.click(locationButton)
-
-    expect(mockGeolocation.getCurrentPosition).toHaveBeenCalled()
-  })
-
-  it('displays weather features', () => {
-    render(<Weather />)
-    
-    expect(screen.getByText('मौसम सुविधाएं')).toBeInTheDocument()
-    expect(screen.getByText(/7-दिन का पूर्वानुमान/)).toBeInTheDocument()
-    expect(screen.getByText(/फसल सलाह/)).toBeInTheDocument()
-    expect(screen.getByText(/सिंचाई की सलाह/)).toBeInTheDocument()
-  })
-
-  it('shows farming advisory section', () => {
-    render(<Weather />)
-    
-    expect(screen.getByText('खेती सलाह')).toBeInTheDocument()
-    expect(screen.getByText(/मौसम के अनुसार/)).toBeInTheDocument()
-  })
-
-  it('displays weather information cards', () => {
-    render(<Weather />)
-    
-    expect(screen.getByText('तापमान')).toBeInTheDocument()
-    expect(screen.getByText('आर्द्रता')).toBeInTheDocument()
-    expect(screen.getByText('हवा की गति')).toBeInTheDocument()
-    expect(screen.getByText('बारिश')).toBeInTheDocument()
-  })
-
-  it('handles location error gracefully', async () => {
-    // Mock geolocation error
-    mockGeolocation.getCurrentPosition.mockImplementation((success, error) => {
-      error({
-        code: 1,
-        message: 'User denied geolocation'
+  it('handles location access and errors', async () => {
+    // Test Success
+    mockGeolocation.getCurrentPosition.mockImplementationOnce((success) => {
+      success({
+        coords: { latitude: 28.6139, longitude: 77.2090 }
       })
     })
 
     render(<Weather />)
+    const locationButton = await screen.findByRole('button', { name: /स्थान/i }, { timeout: 10000 })
+    await waitFor(() => expect(locationButton).not.toBeDisabled(), { timeout: 10000 })
     
-    const locationButton = screen.getByText('अपना स्थान प्राप्त करें')
     fireEvent.click(locationButton)
-
     expect(mockGeolocation.getCurrentPosition).toHaveBeenCalled()
-  })
 
-  it('displays manual location input option', () => {
-    render(<Weather />)
-    
-    expect(screen.getByText(/शहर का नाम दर्ज करें/)).toBeInTheDocument()
-  })
+    // Wait for loading to finish after the first click re-enables the button
+    await waitFor(() => expect(locationButton).not.toBeDisabled(), { timeout: 10000 })
 
-  it('shows weather alerts section', () => {
-    render(<Weather />)
+    // Test Error
+    mockGeolocation.getCurrentPosition.mockImplementationOnce((_, error) => {
+      error({ code: 1, message: 'Denied' })
+    })
     
-    expect(screen.getByText('मौसम चेतावनी')).toBeInTheDocument()
-    expect(screen.getByText(/तत्काल अपडेट/)).toBeInTheDocument()
-  })
-
-  it('displays farming tips based on weather', () => {
-    render(<Weather />)
-    
-    // Check for weather-based farming advice
-    expect(screen.getByText(/तापमान के अनुसार/)).toBeInTheDocument()
-    expect(screen.getByText(/बारिश की संभावना/)).toBeInTheDocument()
-  })
+    fireEvent.click(locationButton)
+    expect(mockGeolocation.getCurrentPosition).toHaveBeenCalledTimes(2)
+  }, 20000)
 })

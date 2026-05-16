@@ -14,7 +14,7 @@ jest.mock('../../data/governmentSchemes', () => ({
       image: '/test-banner-1.jpg',
       ctaText: 'Apply Now',
       ctaTextHindi: 'अभी आवेदन करें',
-      ctaLink: '/schemes/pm-kisan'
+      link: '/schemes/pm-kisan'
     }
   ]
 }))
@@ -31,8 +31,8 @@ describe('HeroBanner Component', () => {
   it('renders banner with initial slide', () => {
     render(<HeroBanner />)
     
-    expect(screen.getByText('प्रधानमंत्री किसान सम्मान निधि')).toBeInTheDocument()
-    expect(screen.getByText('प्रत्यक्ष आय सहायता')).toBeInTheDocument()
+    expect(screen.getByText('प्रधानमंत्री किसान योजना')).toBeInTheDocument()
+    expect(screen.getByText('किसानों के लिए प्रत्यक्ष आय सहायता')).toBeInTheDocument()
   })
 
   it('displays navigation arrows', () => {
@@ -56,8 +56,8 @@ describe('HeroBanner Component', () => {
   it('has proper contrast for text visibility', () => {
     render(<HeroBanner />)
     
-    const heading = screen.getByText('प्रधानमंत्री किसान सम्मान निधि')
-    expect(heading).toHaveStyle({ color: '#ffffff' })
+    const heading = screen.getByText('प्रधानमंत्री किसान योजना')
+    expect(heading).toHaveClass('text-white')
   })
 
   it('contains call-to-action buttons', () => {

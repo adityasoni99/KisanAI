@@ -54,6 +54,10 @@ export const useSpeechSynthesis = (
         return
       }
 
+      if (!text || text.trim() === '') {
+        return
+      }
+
       // Cancel any ongoing speech
       synthRef.current.cancel()
 

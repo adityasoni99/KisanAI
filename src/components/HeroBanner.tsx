@@ -67,12 +67,14 @@ export default function HeroBanner() {
         {/* Navigation Arrows */}
         <button
           onClick={prevSlide}
+          aria-label="Previous slide"
           className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-60 hover:bg-opacity-80 dark:bg-opacity-70 dark:hover:bg-opacity-90 text-white p-3 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl border-2 border-white border-opacity-30"
         >
           <ChevronLeft className="h-6 w-6" />
         </button>
         <button
           onClick={nextSlide}
+          aria-label="Next slide"
           className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-60 hover:bg-opacity-80 dark:bg-opacity-70 dark:hover:bg-opacity-90 text-white p-3 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl border-2 border-white border-opacity-30"
         >
           <ChevronRight className="h-6 w-6" />

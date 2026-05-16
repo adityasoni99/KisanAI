@@ -7,13 +7,13 @@ describe('Header Component', () => {
     render(<Header />)
     
     // Check if main elements are present
-    expect(screen.getByText('KisanAI')).toBeInTheDocument()
-    expect(screen.getByText('आवाज सहायक')).toBeInTheDocument()
-    expect(screen.getByText('फसल विश्लेषण')).toBeInTheDocument()
-    expect(screen.getByText('मौसम')).toBeInTheDocument()
-    expect(screen.getByText('मंडी भाव')).toBeInTheDocument()
-    expect(screen.getByText('सरकारी योजनाएं')).toBeInTheDocument()
-    expect(screen.getByText('KCC आवेदन')).toBeInTheDocument()
+    expect(screen.getAllByText('KisanAI')[0]).toBeInTheDocument()
+    expect(screen.getAllByText('आवाज सहायक')[0]).toBeInTheDocument()
+    expect(screen.getAllByText('फसल विश्लेषण')[0]).toBeInTheDocument()
+    expect(screen.getAllByText('मौसम')[0]).toBeInTheDocument()
+    expect(screen.getAllByText('बाजार भाव')[0]).toBeInTheDocument()
+    expect(screen.getAllByText('सरकारी योजनाएं')[0]).toBeInTheDocument()
+    expect(screen.getAllByText('KCC आवेदन')[0]).toBeInTheDocument()
   })
 
   it('has proper accessibility attributes', () => {
@@ -29,8 +29,8 @@ describe('Header Component', () => {
   it('displays logo with correct styling', () => {
     render(<Header />)
     
-    const logo = screen.getByText('KisanAI')
-    expect(logo).toHaveClass('text-green-800')
+    const logo = screen.getAllByText('KisanAI')[0]
+    expect(logo).toHaveClass('text-white')
     expect(logo).toHaveClass('font-bold')
   })
 

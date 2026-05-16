@@ -20,6 +20,24 @@ const mockSpeechSynthesis = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ;(global as any).speechSynthesis = mockSpeechSynthesis
 
+// Mock SpeechSynthesisUtterance
+class MockSpeechSynthesisUtterance {
+  text: string
+  lang: string = ''
+  rate: number = 1
+  pitch: number = 1
+  volume: number = 1
+  onend: (() => void) | null = null
+  onerror: (() => void) | null = null
+  
+  constructor(text: string) {
+    this.text = text
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+;(global as any).SpeechSynthesisUtterance = MockSpeechSynthesisUtterance
+
 describe('useSpeechSynthesis Hook', () => {
   beforeEach(() => {
     jest.clearAllMocks()
