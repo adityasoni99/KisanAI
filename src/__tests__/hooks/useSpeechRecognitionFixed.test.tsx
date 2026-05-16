@@ -6,6 +6,7 @@ import { useSpeechRecognition } from '@/hooks/useSpeechRecognition'
 const mockStart = jest.fn()
 const mockStop = jest.fn()
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const MockSpeechRecognition = jest.fn().mockImplementation(function(this: any) {
   this.start = jest.fn(() => {
     mockStart()
